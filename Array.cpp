@@ -2,29 +2,26 @@
 #include <time.h>
 #include <iostream>
 #include <random>
-Arr::Arr(int x, int y)
+Arr::Arr(int x, int y,int minsteps) // Констурктор класса /////////////////////////////////////////
 {
-
-	srand(static_cast<unsigned int>(time(0)));
+	srand(static_cast<unsigned int>(time(0))); // зерно рандома
 	_x = x;
-	_y = y;
+	_y = y;									  
 	maxtry = 10;
-	//tries = 0;
-	f = 0;
+	_error = 0;
+	SetSteps(minsteps); // Минимум шагов 
 	Create_arr();
-	GenIn();
-	GenOut();
 	FillMass();
-	//GenWay();
 }
 
-Arr::~Arr() {
+Arr::~Arr() // Деструктор класса /////////////////////////////////////////////////////
+{
 	for (int i = 0; i<_x; i++)
 		delete[] mass[i];
 	delete[] mass;
 }
 
-void Arr::Create_arr() 
+void Arr::Create_arr() // Создание массива ////////////////////////////////////////////
 {
 	mass = new int*[_x];
 	for (int j = 0; j < _x; j++) {
@@ -32,7 +29,7 @@ void Arr::Create_arr()
 	}
 }
 
-void Arr::FillMass()  // ЗАПОЛНЕНИЕ МАССИВА
+void Arr::FillMass()  // Заполнение массива ///////////////////////////////////////////
 {
 	for (int j = 0; j < _y; j++) {
 		for (int i = 0; i < _x; i++) {
@@ -45,11 +42,13 @@ void Arr::FillMass()  // ЗАПОЛНЕНИЕ МАССИВА
 			mass[_x - 1][_y - 1] = 9;
 		}
 	}
+	GenIn();
+	GenOut();
 	mass[randX_in][randY_in] = 2;
 	mass[randX_out][randY_out] = 3;
 }
 
-void Arr::GenIn() 
+void Arr::GenIn() // Генерация позиции входа ///////////////////////////////////////////
 {
 	randX_in = 0;
 	randY_in = 0;
@@ -90,7 +89,7 @@ void Arr::GenIn()
 	if (curpos.y == _y - 1)
 		curpos.vector = 0;
 }
-void Arr::GenOut()
+void Arr::GenOut() // Генерация позиции выхода ////////////////////////////////////////////
 {
 	randX_out = 0;
 	randY_out = 0;
@@ -126,7 +125,8 @@ void Arr::GenOut()
 	while (randX_out == randX_in && randY_out == randY_in);
 }
 
-void Arr::FindNeigh() {
+void Arr::FindNeigh() // Поиск соседей текущей клетки //////////////////////////////////////
+{
 	/////////////////////////////////////////////////////////////
 	neighb[0].x = curpos.x;					// Верхний сосед
 	if (curpos.y != 0)// Если не верхная часть
@@ -184,14 +184,17 @@ void Arr::FindNeigh() {
 
 }
 
-void Arr::GenWay() 	/////////////////////////////////////////////////////////////	 РАНДОМ
+void Arr::GenWay() 	// Шаг ///////////////////////////////////////////////////////////////
 {
 /*	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dist(0, 3);*/
 	if (curpos.x == randX_out && curpos.y == randY_out)
 	{
-		f = 2;
+		if (steps >= minsteps)
+			_error = 2;
+		else
+			_error = 1;
 		return;
 	}
 	FindNeigh();
@@ -204,7 +207,7 @@ void Arr::GenWay() 	////////////////////////////////////////////////////////////
 		count++;
 		if (count >= maxtry)
 		{
-			f = 1;
+			_error = 1;
 			return;
 		}
 	} while (neighb[a].access != 0 && neighb[a].access != 3);
@@ -216,51 +219,38 @@ void Arr::GenWay() 	////////////////////////////////////////////////////////////
 	else
 	{
 		mass[curpos.x][curpos.y] = 1;
-		if (curpos.vector - neighb[a].vector == -1 || curpos.vector - neighb[a].vector == 3) // Вправо
+		if (curpos.vector - neighb[a].vector == -1 || curpos.vector - neighb[a].vector == 3) // Поворот по ч.с.
 		{
 			mass[curpos.x][curpos.y] = 7;
 		}
-		if (curpos.vector - neighb[a].vector == 1 || curpos.vector - neighb[a].vector == -3) // Влево
+		if (curpos.vector - neighb[a].vector == 1 || curpos.vector - neighb[a].vector == -3) // поворот против ч.с.
 		{
 			mass[curpos.x][curpos.y] = 6;
 		}
 	}
+	if (curpos.x == randX_in && curpos.y == randY_in)
+		mass[curpos.x][curpos.y] = 2;
 
 
 
 	curpos.x = neighb[a].x;
 	curpos.y = neighb[a].y;
-	//mass[curpos.x][curpos.y] = 1;
 	curpos.vector = neighb[a].vector;
 	steps++;
 }
-
-int Arr::WriteArr(int x,int y) {
+int Arr::GetError() // Получить ошибку ////////////////////////////////////////////////////////
+{
+	return _error;
+}
+int Arr::GetSteps() // Получить кол-во шагов //////////////////////////////////////////////////
+{
+	return steps;
+}
+int Arr::WriteArr(int x,int y) // Получить точку карты ////////////////////////////////////////
+{
 	return mass[x][y];
 }
-
-Position Arr::GetPosition() {
-	return curpos;
-}
-
-void Arr::Regenerate() {
-	tries++;
-	steps = 0;
-	GenIn();
-	GenOut();
-	FillMass();
-	test();
-}
-
-void Arr::test() {
-	while (curpos.x != randX_out && curpos.y != randY_out)
-	{
-		if (f == 1)
-		{
-			Regenerate();
-		}
-		else
-			GenWay();
-	}
-
+void Arr::SetSteps(int steps) // Установить минимальное кол-во шагов //////////////////////////
+{
+	minsteps = steps;
 }
