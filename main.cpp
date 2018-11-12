@@ -1,65 +1,81 @@
 #include <iostream>
 #include "Array.h"
 #include <Windows.h>
+#include <string>
 using namespace std;
 
 int main(int argc, char** argv)
 {
 	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hStdOut, 15); // белый цвет текста
 	int x = 0;
 	int y = 0;
+	int minsteps = 0;
+	int attempts = 0;
+	int maxattempts = 100000;
 	cout << "colomns: ";
 	cin >> x;
 	cout << "lines: ";
 	cin >> y;
-	Arr* mass = new Arr(x, y);
+	cout << "Min steps: ";
+	cin >> minsteps;
+	Arr* mass = new Arr(x, y, minsteps);
 
-	for (int j = 0; j < y; j++) {
-		for (int i = 0; i < x; i++) {
-			cout << mass->WriteArr(i, j) << " ";
-		}
-		cout << endl;
-	}
-	Position curpos;
-	system("pause");
 	while (1 != 0) 
 	{
-		mass = new Arr(x, y);
-		//mass->tries = 0;
-		//Arr* mass = new Arr(x, y);
-		//Position curpos;
-		while (mass->f != 2) 
+		attempts = 0;
+		mass = new Arr(x, y, minsteps);
+		while (mass->GetError() != 2) 
 		{
 			mass->GenWay();
-			if (mass->f == 1) 
+			if (mass->GetError() == 1) 
 			{
-				mass = new Arr(x, y);
-				mass->tries++;
+				delete mass;
+				mass = new Arr(x, y, minsteps);
+				attempts++;
+			}
+			if (attempts > maxattempts)
+			{
+				delete mass;
+				cout << "Error" << endl;
+				system("pause");
+				return 0;
 			}
 		}
-		//mass->test();
-		curpos = mass->GetPosition();
-		for (int j = 0; j < y; j++) {
+
+		for (int j = 0; j < y; j++) // Отрисовка массива
+		{
 			for (int i = 0; i < x; i++) {
-				if (curpos.x == i && curpos.y == j) 
+				SetConsoleTextAttribute(hStdOut, 15);
+
+				switch (mass->WriteArr(i, j))
 				{
-					cout << mass->WriteArr(i, j) << " ";
+				case 2:
+					SetConsoleTextAttribute(hStdOut, 6); // Вход (серый)
+					break;
+				case 3:
+					SetConsoleTextAttribute(hStdOut, 12); // Выход (КРАСНЫЙ)
+					break;
+				case 1:
+					SetConsoleTextAttribute(hStdOut, 14); // Прямой коридор (Желтый)
+					break;
+				case 6:
+					SetConsoleTextAttribute(hStdOut, 9); // Поворот по ч.с. (СИНИЙ)
+					break;
+				case 7:
+					SetConsoleTextAttribute(hStdOut, 10); // Поворот против ч.с. (СВЕТЛО-ЗЕЛЕНЫЙ)
+					break;
 				}
-				else
-				{
-					SetConsoleTextAttribute(hStdOut, FOREGROUND_INTENSITY);
-					cout << mass->WriteArr(i, j) << " "; 
-					SetConsoleTextAttribute(hStdOut, FOREGROUND_RED);
-				}
+				cout << mass->WriteArr(i, j) << " ";
 			}
 			cout << endl;
 		}
-		cout << "tries: " << mass->tries << "  steps: " << mass->steps << "  counts: " << mass->count << endl;
-		//delete mass;
-		system("pause");
-		
-
+		cout << "attempts: " << attempts << "  steps: " << mass->GetSteps() << endl; // Статистика
+		delete mass;
+		cout << "end?(y/n): ";
+		string t;
+		cin >> t;
+		if (t == "y") break;
 	}
-	delete mass;
 	return 0;
 }
