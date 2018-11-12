@@ -1,15 +1,16 @@
 /*
-0 - Пустая клетка
-1 - Коридор прямо
-6 - Поворот влево
-7 - Поворот вправо
-2 - Вход
-3 - Выход
-8 - Внешняя стена
-9 - Запрещенная клетка (в углах)
+0 - РџСѓСЃС‚Р°СЏ РєР»РµС‚РєР°
+1 - РљРѕСЂРёРґРѕСЂ РїСЂСЏРјРѕ
+6 - РџРѕРІРѕСЂРѕС‚ РїСЂРѕС‚РёРІ С‡.СЃ.
+7 - РџРѕРІРѕСЂРѕС‚ РїРѕ С‡.СЃ.
+2 - Р’С…РѕРґ
+3 - Р’С‹С…РѕРґ
+8 - Р’РЅРµС€РЅСЏСЏ СЃС‚РµРЅР°
+9 - Р—Р°РїСЂРµС‰РµРЅРЅР°СЏ РєР»РµС‚РєР° (РІ СѓРіР»Р°С…)
 */
 #ifndef ARRAY_H
 #define ARRAY_H
+
 struct Position 
 {
 	int x;
@@ -34,7 +35,7 @@ private:
 	int randX_out, randY_out;
 	int** mass;
 	int maxtry;
-	int count;
+
 	Position curpos;
 	Neigh neighb[4];
 
@@ -54,6 +55,11 @@ public:
 	void GenWay();
 	Position GetPosition();
 	void test();
+	int tries;
+	int steps;
+	int count;
+	int f;
+
 };
 
 #endif
