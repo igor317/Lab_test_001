@@ -1,11 +1,16 @@
 #include "Array.h"
 #include <time.h>
 #include <iostream>
+#include <random>
 Arr::Arr(int x, int y)
 {
+
+	srand(static_cast<unsigned int>(time(0)));
 	_x = x;
 	_y = y;
-	maxtry = 100;
+	maxtry = 10;
+	//tries = 0;
+	f = 0;
 	Create_arr();
 	GenIn();
 	GenOut();
@@ -27,7 +32,7 @@ void Arr::Create_arr()
 	}
 }
 
-void Arr::FillMass()  // ÇÀÏÎËÍÅÍÈÅ ÌÀÑÑÈÂÀ
+void Arr::FillMass()  // Ğ—ĞĞŸĞĞ›ĞĞ•ĞĞ˜Ğ• ĞœĞĞ¡Ğ¡Ğ˜Ğ’Ğ
 {
 	for (int j = 0; j < _y; j++) {
 		for (int i = 0; i < _x; i++) {
@@ -48,18 +53,26 @@ void Arr::GenIn()
 {
 	randX_in = 0;
 	randY_in = 0;
-	srand(time(0));
-
-	randX_in = rand() % (_x);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(0, _x - 1);
+	randX_in = dist(gen);
+	//randX_in = rand() % (_x);
 	if (randX_in == 0 || randX_in == _x - 1) 
 	{
-		while (randY_in == 0 || randY_in == _y-1)
-			randY_in = rand() % (_y);
+		std::uniform_int_distribution<> dist(0, _y - 1);
+		while (randY_in == 0 || randY_in == _y - 1) 
+		{
+			randY_in = dist(gen);
+			//randY_in = rand() % (_y);
+		}
 	}
 	else
 	{
 		int a = 0;
-		a = rand() % 2;
+		std::uniform_int_distribution<> dist(0, 1);
+		a = dist(gen);
+		//a = rand() % 2;
 		if (a == 0) {
 			randY_in = 0;
 		}
@@ -79,22 +92,30 @@ void Arr::GenIn()
 }
 void Arr::GenOut()
 {
-	srand(time(0));
 	randX_out = 0;
 	randY_out = 0;
-
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(0, _x - 1);
 	do
 	{
-		randX_out = rand() % (_x);
+		randX_out = dist(gen);
+		//randX_out = rand() % (_x);
 		if (randX_out == 0 || randX_out == _x - 1)
 		{
-			while (randY_out == 0 || randY_out == _y - 1)
-				randY_out = rand() % (_y);
+			std::uniform_int_distribution<> dist(0, _y - 1);
+			while (randY_out == 0 || randY_out == _y - 1) 
+			{
+				randY_out = dist(gen);
+				//randY_out = rand() % (_y);
+			}
 		}
 		else
 		{
+			std::uniform_int_distribution<> dist(0, 1);
 			int a = 0;
-			a = rand() % 2;
+			a = dist(gen);
+			//a = rand() % 2;
 			if (a == 0) {
 				randY_out = 0;
 			}
@@ -107,8 +128,8 @@ void Arr::GenOut()
 
 void Arr::FindNeigh() {
 	/////////////////////////////////////////////////////////////
-	neighb[0].x = curpos.x;					// Âåğõíèé ñîñåä
-	if (curpos.y != 0)// Åñëè íå âåğõíàÿ ÷àñòü
+	neighb[0].x = curpos.x;					// Ğ’ĞµÑ€Ñ…Ğ½Ğ¸Ğ¹ ÑĞ¾ÑĞµĞ´
+	if (curpos.y != 0)// Ğ•ÑĞ»Ğ¸ Ğ½Ğµ Ğ²ĞµÑ€Ñ…Ğ½Ğ°Ñ Ñ‡Ğ°ÑÑ‚ÑŒ
 	{
 		neighb[0].y = curpos.y - 1;
 		neighb[0].vector = 0;
@@ -120,7 +141,7 @@ void Arr::FindNeigh() {
 	}
 	neighb[0].access = mass[neighb[0].x][neighb[0].y];
 	/////////////////////////////////////////////////////////////
-	if (curpos.x != _x - 1)					// Ïğàâûé ñîñåä
+	if (curpos.x != _x - 1)					// ĞŸÑ€Ğ°Ğ²Ñ‹Ğ¹ ÑĞ¾ÑĞµĞ´
 	{
 		neighb[1].x = curpos.x + 1;
 		neighb[1].vector = 1;
@@ -134,7 +155,7 @@ void Arr::FindNeigh() {
 	neighb[1].y = curpos.y;
 	neighb[1].access = mass[neighb[1].x][neighb[1].y];
 	//////////////////////////////////////////////////////////////
-	neighb[2].x = curpos.x;					// Íèæíèé ñîñåä
+	neighb[2].x = curpos.x;					// ĞĞ¸Ğ¶Ğ½Ğ¸Ğ¹ ÑĞ¾ÑĞµĞ´
 	if (curpos.y != _y - 1)
 	{
 		neighb[2].y = curpos.y + 1;
@@ -147,7 +168,7 @@ void Arr::FindNeigh() {
 	}
 	neighb[2].access = mass[neighb[2].x][neighb[2].y];
 	//////////////////////////////////////////////////////////////
-	if (curpos.x != 0)						// Ëåâûé ñîñåä
+	if (curpos.x != 0)						// Ğ›ĞµĞ²Ñ‹Ğ¹ ÑĞ¾ÑĞµĞ´
 	{
 		neighb[3].x = curpos.x - 1;
 		neighb[3].vector = 1;
@@ -163,48 +184,55 @@ void Arr::FindNeigh() {
 
 }
 
-void Arr::GenWay() 	/////////////////////////////////////////////////////////////	 ĞÀÍÄÎÌ
+void Arr::GenWay() 	/////////////////////////////////////////////////////////////	 Ğ ĞĞĞ”ĞĞœ
 {
+/*	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(0, 3);*/
 	if (curpos.x == randX_out && curpos.y == randY_out)
+	{
+		f = 2;
 		return;
+	}
 	FindNeigh();
 	count = 0;
 	int a = 0;
-	srand(time(0));
 	do
 	{
+		//a = dist(gen);
 		a = rand() % 4;
 		count++;
 		if (count >= maxtry)
 		{
-			Regenerate();
+			f = 1;
 			return;
 		}
 	} while (neighb[a].access != 0 && neighb[a].access != 3);
 
-	if (curpos.vector == neighb[a].vector) // Ïğÿìî
+	if (curpos.vector == neighb[a].vector) // ĞŸÑ€ÑĞ¼Ğ¾
 	{
 		mass[curpos.x][curpos.y] = 1;
 	}
 	else
 	{
 		mass[curpos.x][curpos.y] = 1;
-		if (curpos.vector - neighb[a].vector == -1 || curpos.vector - neighb[a].vector == 3) // Âïğàâî
+		if (curpos.vector - neighb[a].vector == -1 || curpos.vector - neighb[a].vector == 3) // Ğ’Ğ¿Ñ€Ğ°Ğ²Ğ¾
 		{
 			mass[curpos.x][curpos.y] = 7;
 		}
-		if (curpos.vector - neighb[a].vector == 1 || curpos.vector - neighb[a].vector == -3) // Âëåâî
+		if (curpos.vector - neighb[a].vector == 1 || curpos.vector - neighb[a].vector == -3) // Ğ’Ğ»ĞµĞ²Ğ¾
 		{
 			mass[curpos.x][curpos.y] = 6;
 		}
 	}
 
 
+
 	curpos.x = neighb[a].x;
 	curpos.y = neighb[a].y;
 	//mass[curpos.x][curpos.y] = 1;
 	curpos.vector = neighb[a].vector;
-	GenWay();
+	steps++;
 }
 
 int Arr::WriteArr(int x,int y) {
@@ -216,17 +244,18 @@ Position Arr::GetPosition() {
 }
 
 void Arr::Regenerate() {
+	tries++;
+	steps = 0;
 	GenIn();
 	GenOut();
 	FillMass();
-	GenWay();
+	test();
 }
 
 void Arr::test() {
-	count = 0;
 	while (curpos.x != randX_out && curpos.y != randY_out)
 	{
-		if (count > maxtry)
+		if (f == 1)
 		{
 			Regenerate();
 		}
