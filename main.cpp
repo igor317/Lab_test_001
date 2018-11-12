@@ -24,7 +24,20 @@ int main(int argc, char** argv)
 	system("pause");
 	while (1 != 0) 
 	{
-		mass->GenWay();
+		mass = new Arr(x, y);
+		//mass->tries = 0;
+		//Arr* mass = new Arr(x, y);
+		//Position curpos;
+		while (mass->f != 2) 
+		{
+			mass->GenWay();
+			if (mass->f == 1) 
+			{
+				mass = new Arr(x, y);
+				mass->tries++;
+			}
+		}
+		//mass->test();
 		curpos = mass->GetPosition();
 		for (int j = 0; j < y; j++) {
 			for (int i = 0; i < x; i++) {
@@ -41,7 +54,11 @@ int main(int argc, char** argv)
 			}
 			cout << endl;
 		}
+		cout << "tries: " << mass->tries << "  steps: " << mass->steps << "  counts: " << mass->count << endl;
+		//delete mass;
 		system("pause");
+		
+
 	}
 	delete mass;
 	return 0;
