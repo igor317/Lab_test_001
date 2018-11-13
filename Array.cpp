@@ -89,6 +89,7 @@ void Arr::GenIn() // Генерация позиции входа //////////////
 	if (curpos.y == _y - 1)
 		curpos.vector = 0;
 }
+
 void Arr::GenOut() // Генерация позиции выхода ////////////////////////////////////////////
 {
 	randX_out = 0;
@@ -171,12 +172,12 @@ void Arr::FindNeigh() // Поиск соседей текущей клетки /
 	if (curpos.x != 0)						// Левый сосед
 	{
 		neighb[3].x = curpos.x - 1;
-		neighb[3].vector = 1;
+		neighb[3].vector = 3;
 	}
 	else
 	{
 		neighb[3].x = curpos.x + 1;
-		neighb[3].vector = 1;
+		neighb[3].vector = 3;
 	}
 	neighb[3].y = curpos.y;
 	neighb[3].access = mass[neighb[3].x][neighb[3].y];
@@ -186,9 +187,9 @@ void Arr::FindNeigh() // Поиск соседей текущей клетки /
 
 void Arr::GenWay() 	// Шаг ///////////////////////////////////////////////////////////////
 {
-/*	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dist(0, 3);*/
+	/*	std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dist(0, 3);*/
 	if (curpos.x == randX_out && curpos.y == randY_out)
 	{
 		if (steps >= minsteps)
@@ -212,25 +213,17 @@ void Arr::GenWay() 	// Шаг //////////////////////////////////////////////////
 		}
 	} while (neighb[a].access != 0 && neighb[a].access != 3);
 
-	if (curpos.vector == neighb[a].vector) // Прямо
+	mass[curpos.x][curpos.y] = 1;
+	if (curpos.vector - neighb[a].vector == -1 || curpos.vector - neighb[a].vector == 3) // Поворот по ч.с.
 	{
-		mass[curpos.x][curpos.y] = 1;
+		mass[curpos.x][curpos.y] = 7;
 	}
-	else
+	if (curpos.vector - neighb[a].vector == 1 || curpos.vector - neighb[a].vector == -3) // поворот против ч.с.
 	{
-		mass[curpos.x][curpos.y] = 1;
-		if (curpos.vector - neighb[a].vector == -1 || curpos.vector - neighb[a].vector == 3) // Поворот по ч.с.
-		{
-			mass[curpos.x][curpos.y] = 7;
-		}
-		if (curpos.vector - neighb[a].vector == 1 || curpos.vector - neighb[a].vector == -3) // поворот против ч.с.
-		{
-			mass[curpos.x][curpos.y] = 6;
-		}
+		mass[curpos.x][curpos.y] = 6;
 	}
 	if (curpos.x == randX_in && curpos.y == randY_in)
 		mass[curpos.x][curpos.y] = 2;
-
 
 
 	curpos.x = neighb[a].x;
@@ -238,18 +231,22 @@ void Arr::GenWay() 	// Шаг //////////////////////////////////////////////////
 	curpos.vector = neighb[a].vector;
 	steps++;
 }
+
 int Arr::GetError() // Получить ошибку ////////////////////////////////////////////////////////
 {
 	return _error;
 }
+
 int Arr::GetSteps() // Получить кол-во шагов //////////////////////////////////////////////////
 {
 	return steps;
 }
+
 int Arr::WriteArr(int x,int y) // Получить точку карты ////////////////////////////////////////
 {
 	return mass[x][y];
 }
+
 void Arr::SetSteps(int steps) // Установить минимальное кол-во шагов //////////////////////////
 {
 	minsteps = steps;
