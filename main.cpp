@@ -12,8 +12,8 @@ int main(int argc, char** argv)
 	int y = 0;
 	int minsteps = 0;
 	int attempts = 0;
-	int maxattempts = 100000;
-	cout << "colomns: ";
+	int maxattempts = 1000000;
+	cout << "columns: ";
 	cin >> x;
 	cout << "lines: ";
 	cin >> y;
