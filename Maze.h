@@ -3,6 +3,11 @@
 #include "DArray.h"
 #include <random>
 #include <time.h>
+struct Decoder
+{
+	std::string decode;
+	char encode;
+};
 struct Point    // Структура точки (X и Y)
 {
 	int x;
@@ -17,7 +22,7 @@ struct Neighbor // Структура соседей(для проверки клетки на доступность)
 {
 	Point coord;// Координаты (X и Y)
 	char access; // доступ
-	int vector; // направление
+	char vector; // направление
 };
 
 class Maze{
@@ -35,8 +40,12 @@ private:
 	int minst;					// Минимальное кол-во шагов
 	int attempts;				// Количество попыток
 
+
 	Position curpos;			// Текущая позиция
 	Neighbor neighb[4];			// Соседи
+	Decoder dec[12];
+
+	void FillDecoder();			// Заполнить таблицу
 
 	void FillMass();		// Заполнение массива(создание шаблона карты)
 	void GenIn();// Генерация позиции входа
@@ -44,6 +53,7 @@ private:
 	void FindNeigh();		// Поиск соседей текущей позиции
 	void GenStep();						// Генерация пути(шаг)
 	void FindFreePoints();				// Поиск пустых клеток
+	char FindCode(std::string code);
 public:
 	Maze(int x, int y, int minsteps);	// Конструктор класса
 	~Maze();							// Деструктор класса

@@ -9,11 +9,61 @@ Maze::Maze(int x, int y, int minsteps) // Констурктор класса ///////////////////
 	_error = 0;
 	minst = minsteps;
 	mass = new DArray(size.x, size.y);
+	FillDecoder();
 }
 
 Maze::~Maze()
 {
 	delete mass;
+}
+
+void Maze::FillDecoder()
+{
+	dec[0].decode = "LL"; // Лево-лево
+	dec[0].encode = 'L';
+
+	dec[1].decode = "LU"; // Лево-верх
+	dec[1].encode = 'Z';
+
+	dec[2].decode = "LD"; // Лево-низ
+	dec[2].encode = 'X';
+
+	dec[3].decode = "UU"; // Верх-верх
+	dec[3].encode = 'U';
+
+	dec[4].decode = "UL"; // Верх-лево
+	dec[4].encode = 'C';
+
+	dec[5].decode = "UR"; // Верх-право
+	dec[5].encode = 'V';
+
+	dec[6].decode = "RR"; // Право-право
+	dec[6].encode = 'R';
+
+	dec[7].decode = "RU"; // Право-верх
+	dec[7].encode = 'B';
+
+	dec[8].decode = "RD"; // Право-низ
+	dec[8].encode = 'N';
+
+	dec[9].decode = "DD"; // Низ-низ
+	dec[9].encode = 'D';
+
+	dec[10].decode = "DL"; // Низ-лево
+	dec[10].encode = 'M';
+
+	dec[11].decode = "DR"; // Низ-право
+	dec[11].encode = 'P';
+}
+
+char Maze::FindCode(std::string code)
+{
+	for (int i = 0; i < 12; ++i)
+	{
+		if (code == dec[i].decode)
+			return dec[i].encode;
+	}
+	return ' ';
 }
 
 void Maze::FillMass()  // Заполнение массива ///////////////////////////////////////////
@@ -23,10 +73,10 @@ void Maze::FillMass()  // Заполнение массива ///////////////////////////////////
 			mass->GetArr()[i][j] = '0';
 			if (i == 0 || i == size.x - 1 || j == 0 || j == size.y - 1)
 				mass->GetArr()[i][j] = '-';
-			mass->GetArr()[0][0] = ' ';
-			mass->GetArr()[0][size.y - 1] = ' ';
-			mass->GetArr()[size.x - 1][0] = ' ';
-			mass->GetArr()[size.x - 1][size.y - 1] = ' ';
+			mass->GetArr()[0][0] = '-';
+			mass->GetArr()[0][size.y - 1] = '-';
+			mass->GetArr()[size.x - 1][0] = '-';
+			mass->GetArr()[size.x - 1][size.y - 1] = '-';
 		}
 	}
 	GenIn();
@@ -70,13 +120,13 @@ void Maze::GenIn() // Генерация позиции входа //////////////////////////////////
 	curpos.coord.x = entry.x;
 	curpos.coord.y = entry.y;
 	if (curpos.coord.x == 0)
-		curpos.vector = 1;
+		curpos.vector = 'R';
 	if (curpos.coord.x == size.x - 1)
-		curpos.vector = 3;
+		curpos.vector = 'L';
 	if (curpos.coord.y == 0)
-		curpos.vector = 2;
+		curpos.vector = 'D';
 	if (curpos.coord.y == size.y - 1)
-		curpos.vector = 0;
+		curpos.vector = 'U';
 }
 void Maze::GenOut() // Генерация позиции выхода ////////////////////////////////////////////
 {
@@ -119,7 +169,7 @@ void Maze::FindNeigh() // Поиск соседей текущей клетки /////////////////////////
 		neighb[0].coord.y = curpos.coord.y + 1;
 
 	neighb[0].coord.x = curpos.coord.x;
-	neighb[0].vector = 0;
+	neighb[0].vector = 'U';
 	neighb[0].access = mass->GetArr()[neighb[0].coord.x][neighb[0].coord.y];
 	/////////////////////////////////////////////////////////////// Правый сосед
 	if (curpos.coord.x != size.x - 1)					
@@ -127,7 +177,7 @@ void Maze::FindNeigh() // Поиск соседей текущей клетки /////////////////////////
 	else
 		neighb[1].coord.x = curpos.coord.x - 1;
 
-	neighb[1].vector = 1;
+	neighb[1].vector = 'R';
 	neighb[1].coord.y = curpos.coord.y;
 	neighb[1].access = mass->GetArr()[neighb[1].coord.x][neighb[1].coord.y];
 	//////////////////////////////////////////////////////////////// Нижний сосед			
@@ -136,20 +186,21 @@ void Maze::FindNeigh() // Поиск соседей текущей клетки /////////////////////////
 	else
 		neighb[2].coord.y = curpos.coord.y - 1;
 	neighb[2].coord.x = curpos.coord.x;
-	neighb[2].vector = 2;
+	neighb[2].vector = 'D';
 	neighb[2].access = mass->GetArr()[neighb[2].coord.x][neighb[2].coord.y];
 	//////////////////////////////////////////////////////////////// Левый сосед
 	if (curpos.coord.x != 0)						
 		neighb[3].coord.x = curpos.coord.x - 1;
 	else
 		neighb[3].coord.x = curpos.coord.x + 1;
-	neighb[3].vector = 3;
+	neighb[3].vector = 'L';
 	neighb[3].coord.y = curpos.coord.y;
 	neighb[3].access = mass->GetArr()[neighb[3].coord.x][neighb[3].coord.y];
 	///////////////////////////////////////////////////////////////
 }
 void Maze::GenStep() 	// Шаг ///////////////////////////////////////////////////////////////
 {
+	std::string turn = "";			// Для расчета поворота
 	if (curpos.coord.x == exit.x && curpos.coord.y == exit.y)
 	{
 		if (steps >= minst)
@@ -171,30 +222,11 @@ void Maze::GenStep() 	// Шаг ///////////////////////////////////////////////////
 			return;
 		}
 	} while (neighb[a].access != '0' && neighb[a].access != '3');
-	/*if (neighb[a].vector == curpos.vector && neighb[a].vector == 0)
-		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'U';
-	if (neighb[a].vector == curpos.vector && neighb[a].vector == 1)
-		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'R';
-	if (neighb[a].vector == curpos.vector && neighb[a].vector == 2)
-		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'D';
-	if (neighb[a].vector == curpos.vector && neighb[a].vector == 3)
-		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'L';*/
-	switch (neighb[a].vector)
-	{
-	case 0:
-		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'U';
-		break;
-	case 1:
-		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'R';
-		break;
-	case 2:
-		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'D';
-		break;
-	case 3:
-		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'L';
-		break;
-	}
-
+	
+	turn.push_back(curpos.vector);
+	turn.push_back(neighb[a].vector);
+	mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn);
+	//mass->GetArr()[curpos.coord.x][curpos.coord.y] = '';
 	if (curpos.coord.x == entry.x && curpos.coord.y == entry.y)
 		mass->GetArr()[curpos.coord.x][curpos.coord.y] = '2';
 
