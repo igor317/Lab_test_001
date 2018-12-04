@@ -1,69 +1,59 @@
 #include "Maze.h"
-#include <time.h>
-#include <iostream>
-#include <random>
-Maze::Maze(int x, int y,int minsteps) // РљРѕРЅСЃС‚СѓСЂРєС‚РѕСЂ РєР»Р°СЃСЃР° /////////////////////////////////////////
+
+Maze::Maze(int x, int y, int minsteps) // Констурктор класса /////////////////////////////////////////
 {
-	srand(static_cast<unsigned int>(time(0))); // Р·РµСЂРЅРѕ СЂР°РЅРґРѕРјР°
-	map.x = x;
-	map.y = y;									  
+	srand(static_cast<unsigned int>(time(0))); // зерно рандома
+	size.x = x;
+	size.y = y;
 	maxtry = 10;
 	_error = 0;
-	SetSteps(minsteps); // РњРёРЅРёРјСѓРј С€Р°РіРѕРІ 
-	Create_arr();
-	FillMass();
+	minst = minsteps;
+	mass = new DArray(size.x, size.y);
 }
 
-Maze::~Maze() // Р”РµСЃС‚СЂСѓРєС‚РѕСЂ РєР»Р°СЃСЃР° /////////////////////////////////////////////////////
+Maze::~Maze()
 {
-	for (int i = 0; i<map.x; i++)
-		delete[] mass[i];
-	delete[] mass;
+	delete mass;
 }
 
-void Maze::Create_arr() // РЎРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР° ////////////////////////////////////////////
+void Maze::FillMass()  // Заполнение массива ///////////////////////////////////////////
 {
-	mass = new int*[map.x];
-	for (int j = 0; j < map.x; j++) {
-		mass[j] = new int[map.y];
-	}
-}
-
-void Maze::FillMass()  // Р—Р°РїРѕР»РЅРµРЅРёРµ РјР°СЃСЃРёРІР° ///////////////////////////////////////////
-{
-	for (int j = 0; j < map.y; j++) {
-		for (int i = 0; i < map.x; i++) {
-			mass[i][j] = 0;
-			if (i == 0 || i == map.x - 1 || j == 0 || j == map.y - 1)
-				mass[i][j] = 8;
-			mass[0][0] = 9;
-			mass[0][map.y - 1] = 9;
-			mass[map.x - 1][0] = 9;
-			mass[map.x - 1][map.y - 1] = 9;
+	for (int j = 0; j < size.y; j++) {
+		for (int i = 0; i < size.x; i++) {
+			mass->GetArr()[i][j] = '0';
+			if (i == 0 || i == size.x - 1 || j == 0 || j == size.y - 1)
+				mass->GetArr()[i][j] = '-';
+			mass->GetArr()[0][0] = ' ';
+			mass->GetArr()[0][size.y - 1] = ' ';
+			mass->GetArr()[size.x - 1][0] = ' ';
+			mass->GetArr()[size.x - 1][size.y - 1] = ' ';
 		}
 	}
 	GenIn();
 	GenOut();
-	mass[entry.x][entry.y] = 2;
-	mass[exit.x][exit.y] = 3;
+	mass->GetArr()[entry.x][entry.y] = '2';
+	mass->GetArr()[exit.x][exit.y] = '3';
 }
 
-void Maze::GenIn() // Р“РµРЅРµСЂР°С†РёСЏ РїРѕР·РёС†РёРё РІС…РѕРґР° ///////////////////////////////////////////
+char Maze::WriteArr(int x, int y) // Получить точку карты ////////////////////////////////////////
+{
+	return mass->GetArr()[x][y];
+}
+
+void Maze::GenIn() // Генерация позиции входа ///////////////////////////////////////////
 {
 	entry.x = 0;
 	entry.y = 0;
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dist(0, map.x - 1);
+	std::uniform_int_distribution<> dist(0, size.x - 1);
 	entry.x = dist(gen);
-	//entry.x = rand() % (map.x);
-	if (entry.x == 0 || entry.x == map.x - 1) 
+	if (entry.x == 0 || entry.x == size.x - 1)
 	{
-		std::uniform_int_distribution<> dist(0, map.y - 1);
-		while (entry.y == 0 || entry.y == map.y - 1) 
+		std::uniform_int_distribution<> dist(0, size.y - 1);
+		while (entry.y == 0 || entry.y == size.y - 1)
 		{
 			entry.y = dist(gen);
-			//entry.y = rand() % (map.y);
 		}
 	}
 	else
@@ -71,43 +61,39 @@ void Maze::GenIn() // Р“РµРЅРµСЂР°С†РёСЏ РїРѕР·РёС†РёРё РІС…РѕРґР° /////////////
 		int a = 0;
 		std::uniform_int_distribution<> dist(0, 1);
 		a = dist(gen);
-		//a = rand() % 2;
 		if (a == 0) {
 			entry.y = 0;
 		}
 		else
-			entry.y = map.y - 1;
+			entry.y = size.y - 1;
 	}
 	curpos.coord.x = entry.x;
 	curpos.coord.y = entry.y;
 	if (curpos.coord.x == 0)
 		curpos.vector = 1;
-	if (curpos.coord.x == map.x - 1)
+	if (curpos.coord.x == size.x - 1)
 		curpos.vector = 3;
 	if (curpos.coord.y == 0)
 		curpos.vector = 2;
-	if (curpos.coord.y == map.y - 1)
+	if (curpos.coord.y == size.y - 1)
 		curpos.vector = 0;
 }
-
-void Maze::GenOut() // Р“РµРЅРµСЂР°С†РёСЏ РїРѕР·РёС†РёРё РІС‹С…РѕРґР° ////////////////////////////////////////////
+void Maze::GenOut() // Генерация позиции выхода ////////////////////////////////////////////
 {
 	exit.x = 0;
 	exit.y = 0;
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dist(0, map.x - 1);
+	std::uniform_int_distribution<> dist(0, size.x - 1);
 	do
 	{
 		exit.x = dist(gen);
-		//exit.x = rand() % (map.x);
-		if (exit.x == 0 || exit.x == map.x - 1)
+		if (exit.x == 0 || exit.x == size.x - 1)
 		{
-			std::uniform_int_distribution<> dist(0, map.y - 1);
-			while (exit.y == 0 || exit.y == map.y - 1) 
+			std::uniform_int_distribution<> dist(0, size.y - 1);
+			while (exit.y == 0 || exit.y == size.y - 1)
 			{
 				exit.y = dist(gen);
-				//exit.y = rand() % (map.y);
 			}
 		}
 		else
@@ -115,116 +101,102 @@ void Maze::GenOut() // Р“РµРЅРµСЂР°С†РёСЏ РїРѕР·РёС†РёРё РІС‹С…РѕРґР° //////////
 			std::uniform_int_distribution<> dist(0, 1);
 			int a = 0;
 			a = dist(gen);
-			//a = rand() % 2;
 			if (a == 0) {
 				exit.y = 0;
 			}
 			else
-				exit.y = map.y - 1;
+				exit.y = size.y - 1;
 		}
-	} 
-	while (exit.x == entry.x && exit.y == entry.y);
+	} while (exit.x == entry.x && exit.y == entry.y);
 }
 
-void Maze::FindNeigh() // РџРѕРёСЃРє СЃРѕСЃРµРґРµР№ С‚РµРєСѓС‰РµР№ РєР»РµС‚РєРё //////////////////////////////////////
+void Maze::FindNeigh() // Поиск соседей текущей клетки //////////////////////////////////////
 {
-	/////////////////////////////////////////////////////////////
-	neighb[0].coord.x = curpos.coord.x;					// Р’РµСЂС…РЅРёР№ СЃРѕСЃРµРґ
-	if (curpos.coord.y != 0)// Р•СЃР»Рё РЅРµ РІРµСЂС…РЅР°СЏ С‡Р°СЃС‚СЊ
-	{
+	/////////////////////////////////////////////////////////////// Верхний сосед			
+	if (curpos.coord.y != 0)// Если не верхная часть
 		neighb[0].coord.y = curpos.coord.y - 1;
-		neighb[0].vector = 0;
-	}
 	else
-	{
 		neighb[0].coord.y = curpos.coord.y + 1;
-		neighb[0].vector = 0;
-	}
-	neighb[0].access = mass[neighb[0].coord.x][neighb[0].coord.y];
-	/////////////////////////////////////////////////////////////
-	if (curpos.coord.x != map.x - 1)					// РџСЂР°РІС‹Р№ СЃРѕСЃРµРґ
-	{
+
+	neighb[0].coord.x = curpos.coord.x;
+	neighb[0].vector = 0;
+	neighb[0].access = mass->GetArr()[neighb[0].coord.x][neighb[0].coord.y];
+	/////////////////////////////////////////////////////////////// Правый сосед
+	if (curpos.coord.x != size.x - 1)					
 		neighb[1].coord.x = curpos.coord.x + 1;
-		neighb[1].vector = 1;
-	}
 	else
-	{
 		neighb[1].coord.x = curpos.coord.x - 1;
-		neighb[1].vector = 1;
-	}
 
+	neighb[1].vector = 1;
 	neighb[1].coord.y = curpos.coord.y;
-	neighb[1].access = mass[neighb[1].coord.x][neighb[1].coord.y];
-	//////////////////////////////////////////////////////////////
-	neighb[2].coord.x = curpos.coord.x;					// РќРёР¶РЅРёР№ СЃРѕСЃРµРґ
-	if (curpos.coord.y != map.y - 1)
-	{
+	neighb[1].access = mass->GetArr()[neighb[1].coord.x][neighb[1].coord.y];
+	//////////////////////////////////////////////////////////////// Нижний сосед			
+	if (curpos.coord.y != size.y - 1)
 		neighb[2].coord.y = curpos.coord.y + 1;
-		neighb[2].vector = 2;
-	}
 	else
-	{
 		neighb[2].coord.y = curpos.coord.y - 1;
-		neighb[2].vector = 2;
-	}
-	neighb[2].access = mass[neighb[2].coord.x][neighb[2].coord.y];
-	//////////////////////////////////////////////////////////////
-	if (curpos.coord.x != 0)						// Р›РµРІС‹Р№ СЃРѕСЃРµРґ
-	{
+	neighb[2].coord.x = curpos.coord.x;
+	neighb[2].vector = 2;
+	neighb[2].access = mass->GetArr()[neighb[2].coord.x][neighb[2].coord.y];
+	//////////////////////////////////////////////////////////////// Левый сосед
+	if (curpos.coord.x != 0)						
 		neighb[3].coord.x = curpos.coord.x - 1;
-		neighb[3].vector = 3;
-	}
 	else
-	{
 		neighb[3].coord.x = curpos.coord.x + 1;
-		neighb[3].vector = 3;
-	}
+	neighb[3].vector = 3;
 	neighb[3].coord.y = curpos.coord.y;
-	neighb[3].access = mass[neighb[3].coord.x][neighb[3].coord.y];
+	neighb[3].access = mass->GetArr()[neighb[3].coord.x][neighb[3].coord.y];
 	///////////////////////////////////////////////////////////////
-
 }
-
-void Maze::GenWay() 	// РЁР°Рі ///////////////////////////////////////////////////////////////
+void Maze::GenStep() 	// Шаг ///////////////////////////////////////////////////////////////
 {
-	/*	std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<> dist(0, 3);*/
 	if (curpos.coord.x == exit.x && curpos.coord.y == exit.y)
 	{
-		if (steps >= minsteps)
+		if (steps >= minst)
 			_error = 2;
 		else
 			_error = 1;
 		return;
 	}
 	FindNeigh();
-	count = 0;
+	randcount = 0;
 	int a = 0;
 	do
 	{
-		//a = dist(gen);
 		a = rand() % 4;
-		count++;
-		if (count >= maxtry)
+		randcount++;
+		if (randcount >= maxtry)
 		{
 			_error = 1;
 			return;
 		}
-	} while (neighb[a].access != 0 && neighb[a].access != 3);
+	} while (neighb[a].access != '0' && neighb[a].access != '3');
+	/*if (neighb[a].vector == curpos.vector && neighb[a].vector == 0)
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'U';
+	if (neighb[a].vector == curpos.vector && neighb[a].vector == 1)
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'R';
+	if (neighb[a].vector == curpos.vector && neighb[a].vector == 2)
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'D';
+	if (neighb[a].vector == curpos.vector && neighb[a].vector == 3)
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'L';*/
+	switch (neighb[a].vector)
+	{
+	case 0:
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'U';
+		break;
+	case 1:
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'R';
+		break;
+	case 2:
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'D';
+		break;
+	case 3:
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = 'L';
+		break;
+	}
 
-	mass[curpos.coord.x][curpos.coord.y] = 1;
-	if (curpos.vector - neighb[a].vector == -1 || curpos.vector - neighb[a].vector == 3) // РџРѕРІРѕСЂРѕС‚ РїРѕ С‡.СЃ.
-	{
-		mass[curpos.coord.x][curpos.coord.y] = 7;
-	}
-	if (curpos.vector - neighb[a].vector == 1 || curpos.vector - neighb[a].vector == -3) // РїРѕРІРѕСЂРѕС‚ РїСЂРѕС‚РёРІ С‡.СЃ.
-	{
-		mass[curpos.coord.x][curpos.coord.y] = 6;
-	}
 	if (curpos.coord.x == entry.x && curpos.coord.y == entry.y)
-		mass[curpos.coord.x][curpos.coord.y] = 2;
-
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = '2';
 
 	curpos.coord.x = neighb[a].coord.x;
 	curpos.coord.y = neighb[a].coord.y;
@@ -232,22 +204,60 @@ void Maze::GenWay() 	// РЁР°Рі /////////////////////////////////////////////////
 	steps++;
 }
 
-int Maze::GetError() // РџРѕР»СѓС‡РёС‚СЊ РѕС€РёР±РєСѓ ////////////////////////////////////////////////////////
+void Maze::GenWay()
 {
-	return _error;
+	FillMass();
+	_error = 0;
+	attempts = 0;
+	steps = 0;
+	while (_error != 2)
+	{
+		GenStep();
+		if (_error == 1)
+		{
+			FillMass();
+			_error = 0;
+			steps = 0;
+			attempts++;
+		}
+	}
+	FindFreePoints();
 }
 
-int Maze::GetSteps() // РџРѕР»СѓС‡РёС‚СЊ РєРѕР»-РІРѕ С€Р°РіРѕРІ //////////////////////////////////////////////////
+int Maze::GetSteps()
 {
 	return steps;
 }
 
-int Maze::WriteArr(int x,int y) // РџРѕР»СѓС‡РёС‚СЊ С‚РѕС‡РєСѓ РєР°СЂС‚С‹ ////////////////////////////////////////
+int Maze::GetAttemps()
 {
-	return mass[x][y];
+	return attempts;
 }
 
-void Maze::SetSteps(int steps) // РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РјРёРЅРёРјР°Р»СЊРЅРѕРµ РєРѕР»-РІРѕ С€Р°РіРѕРІ //////////////////////////
-{
-	minsteps = steps;
+void Maze::FindFreePoints() {
+	if (freepoints != NULL)
+		delete freepoints;
+	zerocounts = 0;
+	int ct = 0;
+	for (int j = 0; j < size.y; j++)
+	{
+		for (int i = 0; i < size.x; i++)
+		{
+			if (mass->GetArr()[i][j] == '0')
+				zerocounts++;
+		}
+	}
+	freepoints = new Point[zerocounts];
+	for (int j = 0; j < size.y; j++)
+	{
+		for (int i = 0; i < size.x; i++)
+		{
+			if (mass->GetArr()[i][j] == '0')
+			{
+				freepoints[ct].x = i;
+				freepoints[ct].y = j;
+				ct++;
+			}
+		}
+	}
 }
