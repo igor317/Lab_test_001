@@ -23,37 +23,37 @@ void Maze::FillDecoder()
 	dec[0].encode = 'L';
 
 	dec[1].decode = "LU"; // Лево-верх
-	dec[1].encode = 'Z';
+	dec[1].encode = 'C';
 
 	dec[2].decode = "LD"; // Лево-низ
-	dec[2].encode = 'X';
+	dec[2].encode = 'V';
 
 	dec[3].decode = "UU"; // Верх-верх
 	dec[3].encode = 'U';
 
 	dec[4].decode = "UL"; // Верх-лево
-	dec[4].encode = 'C';
+	dec[4].encode = 'B';
 
 	dec[5].decode = "UR"; // Верх-право
 	dec[5].encode = 'V';
 
 	dec[6].decode = "RR"; // Право-право
-	dec[6].encode = 'R';
+	dec[6].encode = 'L';
 
 	dec[7].decode = "RU"; // Право-верх
-	dec[7].encode = 'B';
+	dec[7].encode = 'X';
 
 	dec[8].decode = "RD"; // Право-низ
-	dec[8].encode = 'N';
+	dec[8].encode = 'B';
 
 	dec[9].decode = "DD"; // Низ-низ
-	dec[9].encode = 'D';
+	dec[9].encode = 'U';
 
 	dec[10].decode = "DL"; // Низ-лево
-	dec[10].encode = 'M';
+	dec[10].encode = 'X';
 
 	dec[11].decode = "DR"; // Низ-право
-	dec[11].encode = 'P';
+	dec[11].encode = 'C';
 }
 
 char Maze::FindCode(std::string code)
@@ -164,36 +164,55 @@ void Maze::FindNeigh() // Поиск соседей текущей клетки /////////////////////////
 {
 	/////////////////////////////////////////////////////////////// Верхний сосед			
 	if (curpos.coord.y != 0)// Если не верхная часть
+	{
 		neighb[0].coord.y = curpos.coord.y - 1;
+		neighb[0].vector = 'U';
+	}
 	else
+	{
 		neighb[0].coord.y = curpos.coord.y + 1;
-
+		neighb[0].vector = 'D';
+	}
 	neighb[0].coord.x = curpos.coord.x;
-	neighb[0].vector = 'U';
 	neighb[0].access = mass->GetArr()[neighb[0].coord.x][neighb[0].coord.y];
 	/////////////////////////////////////////////////////////////// Правый сосед
-	if (curpos.coord.x != size.x - 1)					
+	if (curpos.coord.x != size.x - 1)
+	{
 		neighb[1].coord.x = curpos.coord.x + 1;
+		neighb[1].vector = 'R';
+	}
 	else
+	{
 		neighb[1].coord.x = curpos.coord.x - 1;
-
-	neighb[1].vector = 'R';
+		neighb[1].vector = 'L';
+	}
 	neighb[1].coord.y = curpos.coord.y;
 	neighb[1].access = mass->GetArr()[neighb[1].coord.x][neighb[1].coord.y];
 	//////////////////////////////////////////////////////////////// Нижний сосед			
 	if (curpos.coord.y != size.y - 1)
+	{
 		neighb[2].coord.y = curpos.coord.y + 1;
+		neighb[2].vector = 'D';
+	}
 	else
+	{
 		neighb[2].coord.y = curpos.coord.y - 1;
+		neighb[2].vector = 'U';
+	}
 	neighb[2].coord.x = curpos.coord.x;
-	neighb[2].vector = 'D';
+
 	neighb[2].access = mass->GetArr()[neighb[2].coord.x][neighb[2].coord.y];
 	//////////////////////////////////////////////////////////////// Левый сосед
-	if (curpos.coord.x != 0)						
+	if (curpos.coord.x != 0)
+	{
 		neighb[3].coord.x = curpos.coord.x - 1;
+		neighb[3].vector = 'L';
+	}
 	else
+	{
 		neighb[3].coord.x = curpos.coord.x + 1;
-	neighb[3].vector = 'L';
+		neighb[3].vector = 'R';
+	}
 	neighb[3].coord.y = curpos.coord.y;
 	neighb[3].access = mass->GetArr()[neighb[3].coord.x][neighb[3].coord.y];
 	///////////////////////////////////////////////////////////////
@@ -226,7 +245,6 @@ void Maze::GenStep() 	// Шаг ///////////////////////////////////////////////////
 	turn.push_back(curpos.vector);
 	turn.push_back(neighb[a].vector);
 	mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn);
-	//mass->GetArr()[curpos.coord.x][curpos.coord.y] = '';
 	if (curpos.coord.x == entry.x && curpos.coord.y == entry.y)
 		mass->GetArr()[curpos.coord.x][curpos.coord.y] = '2';
 
