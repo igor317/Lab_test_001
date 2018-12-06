@@ -9,54 +9,85 @@ Maze::Maze(int x, int y, int minsteps) // Констурктор класса ///////////////////
 	_error = 0;
 	minst = minsteps;
 	mass = new DArray(size.x, size.y);
+	dubmass = new DArray(size.x, size.y);
 	FillDecoder();
 }
 
 Maze::~Maze()
 {
 	delete mass;
+	if (freepoints != NULL)
+		delete freepoints;
+	if (dubmass != NULL)
+	{
+		delete dubmass;
+	}
 }
 
 void Maze::FillDecoder()
 {
 	dec[0].decode = "LL"; // Лево-лево
 	dec[0].encode = 'L';
+	othdec[0].decode = "LL"; // Лево-лево
+	othdec[0].encode = 'l';
 
 	dec[1].decode = "LU"; // Лево-верх
 	dec[1].encode = 'C';
+	othdec[1].decode = "LU"; // Лево-верх
+	othdec[1].encode = 'c';
 
 	dec[2].decode = "LD"; // Лево-низ
 	dec[2].encode = 'V';
+	othdec[2].decode = "LD"; // Лево-низ
+	othdec[2].encode = 'v';
 
 	dec[3].decode = "UU"; // Верх-верх
 	dec[3].encode = 'U';
+	othdec[3].decode = "UU"; // Верх-верх
+	othdec[3].encode = 'u';
 
 	dec[4].decode = "UL"; // Верх-лево
 	dec[4].encode = 'B';
+	othdec[4].decode = "UL"; // Верх-лево
+	othdec[4].encode = 'b';
 
 	dec[5].decode = "UR"; // Верх-право
 	dec[5].encode = 'V';
+	othdec[5].decode = "UR"; // Верх-право
+	othdec[5].encode = 'v';
 
 	dec[6].decode = "RR"; // Право-право
 	dec[6].encode = 'L';
+	othdec[6].decode = "RR"; // Право-право
+	othdec[6].encode = 'l';
 
 	dec[7].decode = "RU"; // Право-верх
 	dec[7].encode = 'X';
+	othdec[7].decode = "RU"; // Право-верх
+	othdec[7].encode = 'x';
 
 	dec[8].decode = "RD"; // Право-низ
 	dec[8].encode = 'B';
+	othdec[8].decode = "RD"; // Право-низ
+	othdec[8].encode = 'b';
 
 	dec[9].decode = "DD"; // Низ-низ
 	dec[9].encode = 'U';
+	othdec[9].decode = "DD"; // Низ-низ
+	othdec[9].encode = 'u';
 
 	dec[10].decode = "DL"; // Низ-лево
 	dec[10].encode = 'X';
+	othdec[10].decode = "DL"; // Низ-лево
+	othdec[10].encode = 'x';
 
 	dec[11].decode = "DR"; // Низ-право
 	dec[11].encode = 'C';
+	othdec[11].decode = "DR"; // Низ-право
+	othdec[11].encode = 'c';
 }
 
-char Maze::FindCode(std::string code)
+char Maze::FindCode(std::string code, Decoder* dec)
 {
 	for (int i = 0; i < 12; ++i)
 	{
@@ -83,6 +114,7 @@ void Maze::FillMass()  // Заполнение массива ///////////////////////////////////
 	GenOut();
 	mass->GetArr()[entry.x][entry.y] = '2';
 	mass->GetArr()[exit.x][exit.y] = '3';
+	ReplaceMap(mass, dubmass);
 }
 
 char Maze::WriteArr(int x, int y) // Получить точку карты ////////////////////////////////////////
@@ -244,7 +276,7 @@ void Maze::GenStep() 	// Шаг ///////////////////////////////////////////////////
 	
 	turn.push_back(curpos.vector);
 	turn.push_back(neighb[a].vector);
-	mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn);
+	mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn,dec);
 	if (curpos.coord.x == entry.x && curpos.coord.y == entry.y)
 		mass->GetArr()[curpos.coord.x][curpos.coord.y] = '2';
 
@@ -272,6 +304,16 @@ void Maze::GenWay()
 		}
 	}
 	FindFreePoints();
+	/*GenInOther();
+	while (_error != 4)
+	{
+		if (_error == 3)
+		{
+			ReplaceMap(dubmass, mass);
+			_error = 2;
+		}
+		GenOtherStep();
+	}*/
 }
 
 int Maze::GetSteps()
@@ -309,5 +351,96 @@ void Maze::FindFreePoints() {
 				ct++;
 			}
 		}
+	}
+}
+
+void Maze::GenInOther()
+{
+	int a = 0;
+	FindFreePoints();
+	if (zerocounts != 0)
+	{
+		ReplaceMap(mass, dubmass);
+		a = rand() % zerocounts;
+		curpos.coord.x = freepoints[a].x;
+		curpos.coord.y = freepoints[a].y;
+		mass->GetArr()[curpos.coord.x][curpos.coord.y] = '2';
+		//FindFreePoints();
+	}
+	else
+		_error = 4;
+
+}
+
+void Maze::GenOtherStep()
+{
+	std::string turn = "";			// Для расчета поворота
+
+	FindNeigh();
+	randcount = 0;
+	int a = 0;
+	do
+	{
+		a = rand() % 4;
+		randcount++;
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'L' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'U'
+			|| mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'X' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'C'
+			|| mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'V' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'B')
+		{
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = '@';
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (randcount >= maxtry)
+		{
+			_error = 3;
+			ReplaceMap(dubmass, mass);
+			return;
+		}
+	} while (neighb[a].access != '0');
+
+	turn.push_back(curpos.vector);
+	turn.push_back(neighb[a].vector);
+	mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn,othdec);
+
+	curpos.coord.x = neighb[a].coord.x;
+	curpos.coord.y = neighb[a].coord.y;
+	curpos.vector = neighb[a].vector;
+}
+
+void Maze::ReplaceMap(DArray* from, DArray* to)
+{
+	for (int j = 0; j < size.y; ++j) 
+		for (int i = 0; i < size.x; ++i)
+			to->GetArr()[i][j] = from->GetArr()[i][j];
+}
+
+void Maze::rmp()
+{
+	for (int j = 0;j<size.y;j++)
+		for (int i = 0;i<size.x;i++)
+	switch (mass->GetArr()[i][j]) {
+	case 'l':
+		mass->GetArr()[i][j] = 'L';
+		break;
+	case 'u':
+		mass->GetArr()[i][j] = 'U';
+		break;
+	case 'x':
+		mass->GetArr()[i][j] = 'X';
+		break;
+	case 'c':
+		mass->GetArr()[i][j] = 'C';
+		break;
+	case 'v':
+		mass->GetArr()[i][j] = 'V';
+		break;
+	case 'b':
+		mass->GetArr()[i][j] = 'B';
+		break;
 	}
 }

@@ -6,6 +6,7 @@ using namespace std;
 
 void DrawMass(Maze* m,int x,int y)
 {
+	system("cls");
 	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hStdOut, 15);
 	for (int j = 0; j < y; j++)
@@ -39,6 +40,9 @@ void DrawMass(Maze* m,int x,int y)
 			case 'B':
 				SetConsoleTextAttribute(hStdOut, 7);
 				break;
+			case '@':
+				SetConsoleTextAttribute(hStdOut, 12);
+				break;
 			}
 			cout << m->WriteArr(i, j) << " ";
 		}
@@ -63,19 +67,27 @@ void SendToFile(string filename,Maze* m,int x,int y)
 
 int main(int argc, char** argv)
 {
-	int x = 50;
-	int y = 50;
-	int minsteps = 150;
+	int x = 10;
+	int y = 10;
+	int minsteps = 2;
 	Maze* m = new Maze(x, y, minsteps);
 	while (1 != 0) 
 	{
-		system("cls");
 		m->GenWay();
 		DrawMass(m, x, y);
 		cout << "Attempts: " << m->GetAttemps() << "| Steps: " << m->GetSteps() << "| free: " << m->zerocounts << endl;
 		//SendToFile("E:\\UnityProject\\testProject\\Assets\\test2.txt", m, x, y);
 		system("pause");
-
+		m->GenInOther();
+		while (m->_error != 4)
+		{
+			m->GenOtherStep();
+			DrawMass(m, x, y);
+			cout << "Attempts: " << m->GetAttemps() << "| Steps: " << m->GetSteps() << "| free: " << m->zerocounts << endl;
+			system("pause");
+		}
+		cout << "all" << endl;
+		system("pause");
 	}
 	delete m;
 	return 0;

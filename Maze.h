@@ -28,6 +28,7 @@ struct Neighbor // Структура соседей(для проверки клетки на доступность)
 class Maze{
 private:
 	DArray* mass;				// Карта
+	DArray* dubmass;			// Дубликат карты (для создания коридоров)
 	Point size;					// Размер карты
 	Point entry;				// Позиция входа
 	Point exit;					// Позиция выхода
@@ -36,7 +37,7 @@ private:
 	int maxtry;					// Максимальное количество попыток прохода (решение проблемы зацикливания\тупика)
 	int steps;					// Количество шагов
 	int randcount;				// Количество попыток рандома
-	int _error;					// Ошибки (0 - нет ошибок/1 - зациклился/2 - нашел выход)
+
 	int minst;					// Минимальное кол-во шагов
 	int attempts;				// Количество попыток
 
@@ -44,6 +45,7 @@ private:
 	Position curpos;			// Текущая позиция
 	Neighbor neighb[4];			// Соседи
 	Decoder dec[12];
+	Decoder othdec[12];
 
 	void FillDecoder();			// Заполнить таблицу
 
@@ -53,7 +55,9 @@ private:
 	void FindNeigh();		// Поиск соседей текущей позиции
 	void GenStep();						// Генерация пути(шаг)
 	void FindFreePoints();				// Поиск пустых клеток
-	char FindCode(std::string code);
+	char FindCode(std::string code,Decoder* dec);
+	void ReplaceMap(DArray* from, DArray* to);
+	void rmp();
 public:
 	Maze(int x, int y, int minsteps);	// Конструктор класса
 	~Maze();							// Деструктор класса
@@ -61,7 +65,10 @@ public:
 	int GetSteps();						// Получить количество шагов
 	int GetAttemps();					// Получить количество попыток
 	char WriteArr(int x, int y);		// Вывод точки массива(карты)
-
+	void GenInOther();					// Генерация входа на пустой клетке
+	void GenOtherStep();
 	int zerocounts;				// Кол-во пустых клеток
+
+	int _error;					// Ошибки (0 - нет ошибок/1 - зациклился/2 - нашел выход)
 };
 #endif
