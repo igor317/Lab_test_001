@@ -304,7 +304,7 @@ void Maze::GenWay()
 		}
 	}
 	FindFreePoints();
-	/*GenInOther();
+	GenInOther();
 	while (_error != 4)
 	{
 		if (_error == 3)
@@ -313,7 +313,7 @@ void Maze::GenWay()
 			_error = 2;
 		}
 		GenOtherStep();
-	}*/
+	}
 }
 
 int Maze::GetSteps()
@@ -383,14 +383,80 @@ void Maze::GenOtherStep()
 	{
 		a = rand() % 4;
 		randcount++;
-		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'L' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'U'
-			|| mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'X' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'C'
-			|| mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'V' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'B')
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'L')
 		{
+			if (neighb[a].vector == 0)
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'E';
+			else
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'Q';
 			turn.push_back(curpos.vector);
 			turn.push_back(neighb[a].vector);
 			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
-			mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = '@';
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'U')
+		{
+			if (neighb[a].vector == 1)
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'W';
+			else
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'R';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'X')
+		{
+			if (neighb[a].vector == 0)
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'W';
+			else
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'Q';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'C')
+		{
+			if (neighb[a].vector == 1)
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'Q';
+			else
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'R';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'V')
+		{
+			if (neighb[a].vector == 3)
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'R';
+			else
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'E';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'B')
+		{
+			if (neighb[a].vector == 3)
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'E';
+			else
+				mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'W';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
 			rmp();
 			GenInOther();
 			return;
@@ -444,3 +510,16 @@ void Maze::rmp()
 		break;
 	}
 }
+
+/*if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'L' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'U'
+|| mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'X' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'C'
+|| mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'V' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'B')
+{
+turn.push_back(curpos.vector);
+turn.push_back(neighb[a].vector);
+mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = '@';
+rmp();
+GenInOther();
+return;
+}*/

@@ -40,7 +40,16 @@ void DrawMass(Maze* m,int x,int y)
 			case 'B':
 				SetConsoleTextAttribute(hStdOut, 7);
 				break;
-			case '@':
+			case 'Q':
+				SetConsoleTextAttribute(hStdOut, 12);
+				break;
+			case 'W':
+				SetConsoleTextAttribute(hStdOut, 12);
+				break;
+			case 'E':
+				SetConsoleTextAttribute(hStdOut, 12);
+				break;
+			case 'R':
 				SetConsoleTextAttribute(hStdOut, 12);
 				break;
 			}
@@ -78,14 +87,14 @@ int main(int argc, char** argv)
 		cout << "Attempts: " << m->GetAttemps() << "| Steps: " << m->GetSteps() << "| free: " << m->zerocounts << endl;
 		//SendToFile("E:\\UnityProject\\testProject\\Assets\\test2.txt", m, x, y);
 		system("pause");
-		m->GenInOther();
-		while (m->_error != 4)
+		//m->GenInOther();
+		/*while (m->_error != 4)
 		{
 			m->GenOtherStep();
 			DrawMass(m, x, y);
 			cout << "Attempts: " << m->GetAttemps() << "| Steps: " << m->GetSteps() << "| free: " << m->zerocounts << endl;
 			system("pause");
-		}
+		}*/
 		cout << "all" << endl;
 		system("pause");
 	}
