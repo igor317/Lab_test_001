@@ -76,26 +76,16 @@ void SendToFile(string filename,Maze* m,int x,int y)
 
 int main(int argc, char** argv)
 {
-	int x = 10;
-	int y = 10;
-	int minsteps = 2;
+	int x = 15;
+	int y = 15;
+	int minsteps = 50;
 	Maze* m = new Maze(x, y, minsteps);
 	while (1 != 0) 
 	{
 		m->GenWay();
 		DrawMass(m, x, y);
 		cout << "Attempts: " << m->GetAttemps() << "| Steps: " << m->GetSteps() << "| free: " << m->zerocounts << endl;
-		//SendToFile("E:\\UnityProject\\testProject\\Assets\\test2.txt", m, x, y);
-		system("pause");
-		//m->GenInOther();
-		/*while (m->_error != 4)
-		{
-			m->GenOtherStep();
-			DrawMass(m, x, y);
-			cout << "Attempts: " << m->GetAttemps() << "| Steps: " << m->GetSteps() << "| free: " << m->zerocounts << endl;
-			system("pause");
-		}*/
-		cout << "all" << endl;
+		SendToFile("E:\\UnityProject\\testProject\\Assets\\test2.txt", m, x, y);
 		system("pause");
 	}
 	delete m;

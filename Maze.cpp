@@ -461,6 +461,46 @@ void Maze::GenOtherStep()
 			GenInOther();
 			return;
 		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'Q')
+		{
+			mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'K';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'W')
+		{
+			mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'K';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'E')
+		{
+			mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'K';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			rmp();
+			GenInOther();
+			return;
+		}
+		if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'R')
+		{
+			mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = 'K';
+			turn.push_back(curpos.vector);
+			turn.push_back(neighb[a].vector);
+			mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
+			rmp();
+			GenInOther();
+			return;
+		}
 		if (randcount >= maxtry)
 		{
 			_error = 3;
