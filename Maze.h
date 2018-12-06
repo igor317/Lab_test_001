@@ -5,8 +5,8 @@
 #include <time.h>
 struct Decoder
 {
-	std::string decode;
-	char encode;
+	std::string decode;	//Раскодированные символы
+	char encode;		//Код
 };
 struct Point    // Структура точки (X и Y)
 {
@@ -40,24 +40,27 @@ private:
 
 	int minst;					// Минимальное кол-во шагов
 	int attempts;				// Количество попыток
-
+	int _error;					// Ошибки (0 - нет ошибок/1 - зациклился/2 - нашел выход/3 - зациклился(поиск доп. коридоров)/4 - завершено)
+	int zerocounts;				// Кол-во пустых клеток
 
 	Position curpos;			// Текущая позиция
 	Neighbor neighb[4];			// Соседи
-	Decoder dec[12];
-	Decoder othdec[12];
+	Decoder dec[12];			// Таблица кодов (для генерации поворотов осн. коридора)
+	Decoder othdec[12];			// таблица кодов (для генерации поворотов побоч. коридора)
 
 	void FillDecoder();			// Заполнить таблицу
 
-	void FillMass();		// Заполнение массива(создание шаблона карты)
-	void GenIn();// Генерация позиции входа
-	void GenOut();			// Генерация позиции выхода
-	void FindNeigh();		// Поиск соседей текущей позиции
-	void GenStep();						// Генерация пути(шаг)
-	void FindFreePoints();				// Поиск пустых клеток
-	char FindCode(std::string code,Decoder* dec);
-	void ReplaceMap(DArray* from, DArray* to);
-	void rmp();
+	void FillMass();								// Заполнение массива(создание шаблона карты)
+	void GenIn();									// Генерация позиции входа
+	void GenOut();									// Генерация позиции выхода
+	void FindNeigh();								// Поиск соседей текущей позиции
+	void GenStep();									// Генерация пути(шаг)
+	void FindFreePoints();							// Поиск пустых клеток
+	char FindCode(std::string code,Decoder* dec);	// Найти код
+	void ReplaceMap(DArray* from, DArray* to);		// Заменить массив
+	void rmp();										// Вставить побочный коридор в основной
+	void GenInOther();								// Генерация входа на пустой клетке
+	void GenOtherStep();							// Генерация пути побочного коридора(шаг)
 public:
 	Maze(int x, int y, int minsteps);	// Конструктор класса
 	~Maze();							// Деструктор класса
@@ -65,10 +68,6 @@ public:
 	int GetSteps();						// Получить количество шагов
 	int GetAttemps();					// Получить количество попыток
 	char WriteArr(int x, int y);		// Вывод точки массива(карты)
-	void GenInOther();					// Генерация входа на пустой клетке
-	void GenOtherStep();
-	int zerocounts;				// Кол-во пустых клеток
 
-	int _error;					// Ошибки (0 - нет ошибок/1 - зациклился/2 - нашел выход)
 };
 #endif

@@ -2,6 +2,7 @@
 #include "Maze.h"
 #include <Windows.h>
 #include <fstream>
+#include <string>
 using namespace std;
 
 void DrawMass(Maze* m,int x,int y)
@@ -76,18 +77,31 @@ void SendToFile(string filename,Maze* m,int x,int y)
 
 int main(int argc, char** argv)
 {
-	int x = 15;
-	int y = 15;
-	int minsteps = 50;
-	Maze* m = new Maze(x, y, minsteps);
-	while (1 != 0) 
+	system("cls");
+	int x = 0;
+	int y = 0;
+	int minsteps = 0;
+	string test = "";
+	string a = "";
+	while (test != "n") 
 	{
+		cout << "column: ";
+		cin >> x;
+		cout << "lines: ";
+		cin >> y;
+		cout << "min steps: ";
+		cin >> minsteps;
+		Maze* m = new Maze(x, y, minsteps);
 		m->GenWay();
 		DrawMass(m, x, y);
-		cout << "Attempts: " << m->GetAttemps() << "| Steps: " << m->GetSteps() << "| free: " << m->zerocounts << endl;
-		SendToFile("E:\\UnityProject\\testProject\\Assets\\test2.txt", m, x, y);
-		system("pause");
+		cout << "Attempts: " << m->GetAttemps() << "| Steps: " << m->GetSteps() << endl;
+		cout << "SaveFile? (y//n): ";
+		cin >> a;
+		if (a == "y")
+			SendToFile("E:\\UnityProject\\testProject\\Assets\\test2.txt", m, x, y);
+		cout << "Create new maze? (y//n): ";
+		cin >> test;
+		delete m;
 	}
-	delete m;
 	return 0;
 }

@@ -365,7 +365,6 @@ void Maze::GenInOther()
 		curpos.coord.x = freepoints[a].x;
 		curpos.coord.y = freepoints[a].y;
 		mass->GetArr()[curpos.coord.x][curpos.coord.y] = '2';
-		//FindFreePoints();
 	}
 	else
 		_error = 4;
@@ -550,16 +549,3 @@ void Maze::rmp()
 		break;
 	}
 }
-
-/*if (mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'L' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'U'
-|| mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'X' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'C'
-|| mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'V' || mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] == 'B')
-{
-turn.push_back(curpos.vector);
-turn.push_back(neighb[a].vector);
-mass->GetArr()[curpos.coord.x][curpos.coord.y] = FindCode(turn, othdec);
-mass->GetArr()[neighb[a].coord.x][neighb[a].coord.y] = '@';
-rmp();
-GenInOther();
-return;
-}*/
